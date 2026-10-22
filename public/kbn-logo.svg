@@ -1,0 +1,69 @@
+<svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <clipPath id="kc"><circle cx="100" cy="100" r="97"/></clipPath>
+  </defs>
+
+  <!-- Amber border ring + dark fill -->
+  <circle cx="100" cy="100" r="100" fill="#F5A500"/>
+  <circle cx="100" cy="100" r="97" fill="#0f0f0f"/>
+
+  <!-- Rising sun -->
+  <circle cx="100" cy="66" r="46" fill="#F5A500"/>
+
+  <!-- Birds silhouetted against sun -->
+  <path d="M69 53 Q72.5 48 76 53" stroke="#0f0f0f" stroke-width="1.8" fill="none" stroke-linecap="round"/>
+  <path d="M80 44 Q83.5 39.5 87 44" stroke="#0f0f0f" stroke-width="1.8" fill="none" stroke-linecap="round"/>
+  <path d="M92 50 Q95.5 45.5 99 50" stroke="#0f0f0f" stroke-width="1.8" fill="none" stroke-linecap="round"/>
+
+  <g clip-path="url(#kc)">
+    <!-- Ground fill -->
+    <rect x="0" y="118" width="200" height="82" fill="#0f0f0f"/>
+
+    <!-- Victoria Memorial dome (centre, silhouette against sun) -->
+    <path d="M78,118 L78,108 Q78,91 100,84 Q122,91 122,108 L122,118 Z" fill="#0f0f0f"/>
+    <!-- Dome spire -->
+    <rect x="99.5" y="80" width="1.5" height="5" fill="#0f0f0f"/>
+    <!-- Left wing + tower -->
+    <rect x="62" y="108" width="16" height="10" fill="#0f0f0f"/>
+    <rect x="62" y="105" width="8" height="3" fill="#0f0f0f"/>
+    <!-- Right wing + tower -->
+    <rect x="122" y="108" width="16" height="10" fill="#0f0f0f"/>
+    <rect x="130" y="105" width="8" height="3" fill="#0f0f0f"/>
+
+    <!-- Left cluster buildings (in sun zone) -->
+    <rect x="46" y="107" width="12" height="11" fill="#0f0f0f"/>
+    <rect x="48" y="103" width="6" height="4" fill="#0f0f0f"/>
+    <rect x="50" y="99" width="3" height="4" fill="#0f0f0f"/>
+
+    <!-- Right cluster buildings (in sun zone) -->
+    <rect x="142" y="107" width="12" height="11" fill="#0f0f0f"/>
+    <rect x="144" y="103" width="6" height="4" fill="#0f0f0f"/>
+    <rect x="146" y="99" width="3" height="4" fill="#0f0f0f"/>
+  </g>
+
+  <!-- Howrah Bridge arms — amber outlines on dark flanks -->
+  <!-- Left pylon top cap + arm -->
+  <rect x="33" y="89" width="11" height="2.5" fill="#F5A500" fill-opacity="0.7"/>
+  <rect x="36.5" y="91.5" width="4" height="22" fill="#F5A500" fill-opacity="0.6"/>
+  <line x1="36" y1="92" x2="6" y2="116" stroke="#F5A500" stroke-width="1.6" stroke-opacity="0.55"/>
+  <line x1="40" y1="92" x2="62" y2="116" stroke="#F5A500" stroke-width="1" stroke-opacity="0.4"/>
+  <line x1="6" y1="116" x2="62" y2="116" stroke="#F5A500" stroke-width="1.4" stroke-opacity="0.45"/>
+
+  <!-- Right pylon top cap + arm (mirror) -->
+  <rect x="156" y="89" width="11" height="2.5" fill="#F5A500" fill-opacity="0.7"/>
+  <rect x="159.5" y="91.5" width="4" height="22" fill="#F5A500" fill-opacity="0.6"/>
+  <line x1="164" y1="92" x2="194" y2="116" stroke="#F5A500" stroke-width="1.6" stroke-opacity="0.55"/>
+  <line x1="160" y1="92" x2="138" y2="116" stroke="#F5A500" stroke-width="1" stroke-opacity="0.4"/>
+  <line x1="194" y1="116" x2="138" y2="116" stroke="#F5A500" stroke-width="1.4" stroke-opacity="0.45"/>
+
+  <!-- Text -->
+  <text x="100" y="145" text-anchor="middle"
+        font-family="'Arial Black','Arial Bold','Helvetica Neue',Arial,sans-serif"
+        font-size="17" font-weight="900" fill="#FFFFFF" letter-spacing="1.5">KOLKATA</text>
+  <text x="100" y="162" text-anchor="middle"
+        font-family="'Arial Black','Arial Bold','Helvetica Neue',Arial,sans-serif"
+        font-size="15" font-weight="900" fill="#D62828" letter-spacing="2.5">BRAND</text>
+  <text x="100" y="179" text-anchor="middle"
+        font-family="'Arial Black','Arial Bold','Helvetica Neue',Arial,sans-serif"
+        font-size="15" font-weight="900" fill="#F5A500" letter-spacing="2.5">NEWS</text>
+</svg>

@@ -1,0 +1,44 @@
+{
+  "name": "the-lookback",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "next dev --hostname 127.0.0.1",
+    "prebuild": "payload generate:importmap",
+    "build": "next build",
+    "start": "next start --hostname 127.0.0.1",
+    "typecheck": "tsc --noEmit",
+    "generate:types": "payload generate:types",
+    "generate:importmap": "payload generate:importmap",
+    "seed": "tsx scripts/seed.ts",
+    "test": "tsx --test tests/*.test.ts",
+    "test:cms": "tsx scripts/verify-cms.ts",
+    "migrate": "payload migrate",
+    "migrate:create": "node scripts/create-postgres-migration.mjs",
+    "setup": "node scripts/setup.mjs"
+  },
+  "dependencies": {
+    "@payloadcms/db-postgres": "3.90.2",
+    "@payloadcms/db-sqlite": "3.90.2",
+    "@payloadcms/next": "3.90.2",
+    "@payloadcms/richtext-lexical": "3.90.2",
+    "@payloadcms/storage-s3": "3.90.2",
+    "graphql": "^16.11.0",
+    "gsap": "3.15.0",
+    "next": "16.4.0",
+    "payload": "3.90.2",
+    "react": "19.3.0",
+    "react-dom": "19.3.0",
+    "sharp": "^0.34.3"
+  },
+  "devDependencies": {
+    "@types/node": "^24.0.0",
+    "@types/react": "^19.0.0",
+    "@types/react-dom": "^19.0.0",
+    "cheerio": "^1.1.2",
+    "tsx": "^4.20.0",
+    "typescript": "^5.9.2"
+  },
+  "engines": { "node": ">=22.0.0" }
+}
