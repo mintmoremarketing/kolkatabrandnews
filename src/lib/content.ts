@@ -6,13 +6,16 @@ import { draftMode, headers } from 'next/headers'
 import type { Article, MediaItem, SiteSettings } from './types'
 import { defaultSettings } from './defaults'
 
+// Payload prefixes local uploads with serverURL; keep them relative so any port/host works.
+const serverURL = (process.env.NEXT_PUBLIC_SERVER_URL || 'http://localhost:3000').replace(/\/$/, '')
+const relative = (url?: string | null) => url && url.startsWith(serverURL + '/') ? url.slice(serverURL.length) : url || undefined
 export function mapMedia(media: any): MediaItem | null {
   if (!media || typeof media !== 'object' || !media.url) return null
   const video = media.mimeType?.startsWith('video/')
   const preserveAnimation = ['image/gif', 'image/webp'].includes(media.mimeType)
-  return { src: video || preserveAnimation ? media.url : media.sizes?.card?.url || media.url,
+  return { src: relative(video || preserveAnimation ? media.url : media.sizes?.card?.url || media.url)!,
     width: media.width || 800, height: media.height || 1000, alt: media.alt || '', caption: media.caption || '',
-    type: video ? 'video' : 'image', poster: media.thumbnailURL || undefined }
+    type: video ? 'video' : 'image', poster: relative(media.thumbnailURL) }
 }
 export function mapArticle(doc: any): Article {
   const gallery = (doc.gallery || []).flatMap((g: any) => {
@@ -43,8 +46,8 @@ export const getContent = cache(async () => {
   for (const key of ['brand','title','abbreviation','year','aboutTitle','aboutIntro','aboutText','thanks','contactEmail','studioUrl'] as const) {
     if (raw[key]) settings[key] = raw[key]
   }
-  settings.aboutVideo = raw.aboutVideo?.url || defaultSettings.aboutVideo
+  settings.aboutVideo = relative(raw.aboutVideo?.url) || defaultSettings.aboutVideo
   if (raw.credits?.length) settings.credits = raw.credits
-  settings.playlist = (raw.playlist || []).filter((t: any) => t.audio?.url).map((t: any) => ({ title: t.title, artist: t.artist, src: t.audio.url, artwork: t.artwork?.url }))
+  settings.playlist = (raw.playlist || []).filter((t: any) => t.audio?.url).map((t: any) => ({ title: t.title, artist: t.artist, src: relative(t.audio.url)!, artwork: relative(t.artwork?.url) }))
   return { articles: result.docs.map(mapArticle), settings, preview: Boolean(user) }
 })
