@@ -19,6 +19,7 @@ export function ArchiveShell({ articles, settings, preview, children }: { articl
   const isArticle = pathname.startsWith('/articles/')
   const isAbout = pathname === '/about'
   const isIndex = pathname === '/articles'
+  const isWelcome = pathname === '/welcome'
   const mode = pathname === '/surf' ? 'surf' : 'timeline'
   const [returnTo, setReturnTo] = useState('/')
   const [selected, setSelected] = useState<ArchiveContextValue['selected']>(null)
@@ -27,7 +28,8 @@ export function ArchiveShell({ articles, settings, preview, children }: { articl
   const collectionTransitioning = useRef(false)
   const [photoTransition, setPhotoTransition] = useState<PhotoTransition | null>(null)
   const [collectionOpening, setCollectionOpening] = useState(false)
-  const [entered, setEntered] = useState(true)
+  // Start with the welcome screen up on / and /welcome so the timeline never flashes before it.
+  const [entered, setEntered] = useState(() => preview || !['/', '/welcome'].includes(pathname))
   const [ready, setReady] = useState(false)
   const [soundRequested, setSoundRequested] = useState(false)
   const [year, setYear] = useState(settings.year)
@@ -50,8 +52,12 @@ export function ArchiveShell({ articles, settings, preview, children }: { articl
   }, [router, preview])
 
   useLayoutEffect(() => {
-    if (pathname === '/' && !sessionStorage.getItem('kbn-entered') && !preview) setEntered(false)
+    delete document.documentElement.dataset.kbnEntered
+    if (pathname !== '/' || preview) return
+    if (sessionStorage.getItem('kbn-entered')) setEntered(true)
+    else router.replace('/welcome', { scroll: false })
   }, [])
+  useLayoutEffect(() => { if (isWelcome) setEntered(false) }, [isWelcome])
   useEffect(() => {
     const media = matchMedia('(prefers-reduced-motion: reduce)')
     setReduced(media.matches)
@@ -96,7 +102,9 @@ export function ArchiveShell({ articles, settings, preview, children }: { articl
   }, [photoTransition])
 
   const openArticle = useCallback((article: Article, media: MediaItem, element?: HTMLElement | null) => {
-    const fromArticle = pathname.startsWith('/articles/')
+    // Use what's on screen, not the URL: the URL only updates after the server responds,
+    // and a quick next/prev click before then must still slide the carousel, not replay the fly-in.
+    const fromArticle = !dismissed && (Boolean(selected) || pathname.startsWith('/articles/'))
     const fromSurf = pathname === '/surf'
     const currentSlug = selected?.slug || (fromArticle ? decodeURIComponent(pathname.slice('/articles/'.length)) : null)
     const currentIndex = currentSlug ? articles.findIndex(item => item.slug === currentSlug) : -1
@@ -207,12 +215,13 @@ export function ArchiveShell({ articles, settings, preview, children }: { articl
     }
 
     commitCollectionOpen()
-  }, [articles, pathname, reduced, router, selected?.slug])
+  }, [articles, pathname, reduced, router, selected?.slug, dismissed])
   const finishPhotoTransition = useCallback(() => setPhotoTransition(null), [])
   const closeArticle = useCallback(() => { setPhotoTransition(null); setDismissed(true); setSelected(null); router.push(returnTo, { scroll: false }) }, [returnTo, router])
   const enter = (sound: boolean) => {
     sessionStorage.setItem('kbn-entered', '1')
     setSoundRequested(sound)
+    router.replace('/', { scroll: false })
     if (reduced) setEntered(true)
     else gsap.to('.entry-screen', { yPercent: -100, duration: 1, ease: 'expo.inOut', onComplete: () => setEntered(true) })
   }
@@ -249,12 +258,12 @@ export function ArchiveShell({ articles, settings, preview, children }: { articl
         </div>
         <SoundPlayer tracks={settings.playlist} requested={soundRequested} />
       </header>
-      <div className={`masthead ${pathname !== '/' ? 'compact' : ''} masthead-hidden`} aria-label={`${settings.brand} ${settings.title}`}>
+      <div className={`masthead ${pathname !== '/' && !isWelcome ? 'compact' : ''} masthead-hidden`} aria-label={`${settings.brand} ${settings.title}`}>
         <div className="masthead-expanded"><div>{settings.brand}</div><div>{settings.title}</div><div>({settings.abbreviation}/{year})</div></div>
         <div className="masthead-compact"><div>({settings.abbreviation})</div><div>{settings.abbreviation}/{year}</div></div>
       </div>
       <main id="main">
-        <div className={`gallery-layer ${articleVisible || isAbout || isIndex || !['/','/surf'].includes(pathname) ? 'layer-hidden' : ''}`} inert={articleVisible || isAbout || isIndex || !entered}>
+        <div className={`gallery-layer ${articleVisible || isAbout || isIndex || !['/','/surf','/welcome'].includes(pathname) ? 'layer-hidden' : ''}`} inert={articleVisible || isAbout || isIndex || !entered}>
           <Gallery items={items} mode={mode} active={entered && !articleVisible && !isAbout && !isIndex && !collectionOpening} onYear={setYear} reduced={reduced} />
         </div>
         {isIndex && <ArchiveIndex />}
@@ -269,11 +278,21 @@ export function ArchiveShell({ articles, settings, preview, children }: { articl
       </nav>}
       {preview && <a className="preview-banner" href="/exit-preview">Draft preview · Exit ↗</a>}
       {!entered && <div className="entry-screen" role="dialog" aria-modal="true" aria-label="Welcome to Kolkata Brand News">
-        {articles[0]?.gallery[0] && <div className="entry-photo" aria-hidden="true"><img src={articles[0].gallery[0].src} alt="" /></div>}
-        <span className="entry-status label">{ready ? 'LOADED' : 'LOADING THE ARCHIVE…'}</span>
-        <div className="entry-inventory label">{Array.from(new Map(items.map(i => [`${i.year}-${i.month}`, i])).values()).slice(0, 6).map(i => <div key={`${i.year}-${i.month}`}><span>{i.month.toUpperCase()}</span><p>ARTICLES ({articles.filter(a => a.date.slice(0,7) === i.article.date.slice(0,7)).length})<br />INSPIRATION<br />WORK & CULTURE<br />MUSIC PLAYLIST</p></div>)}</div>
-        <div className="entry-actions"><button disabled={!ready} onClick={() => enter(true)}>Enter with sound <span>↗</span></button><button className="entry-without" disabled={!ready} onClick={() => enter(false)}>…or without</button></div>
-        <span className="entry-bottom label">A LIVING ARCHIVE / {String(articles.length).padStart(2,'0')} STORIES</span>
+        <div className="entry-photo">
+          <img src="/welcome-howrah.jpg" alt="Howrah Bridge over the Hooghly, Kolkata" />
+          <a className="entry-credit label" href="https://commons.wikimedia.org/wiki/File:The_Howrah_Bridge,_Kolkata,_India.jpg" target="_blank" rel="noreferrer">Photo: Vyacheslav Argenberg, CC BY 4.0</a>
+        </div>
+        <div className="entry-panel">
+          <h1 className="entry-title"><span>Kolkata</span><span>Brand</span><span>News</span></h1>
+          <div className="entry-inventory label">{Array.from(new Map(items.map(i => [`${i.year}-${i.month}`, i])).values()).slice(0, 6).map(i => {
+            const inMonth = articles.filter(a => a.date.slice(0, 7) === i.article.date.slice(0, 7))
+            return <div key={`${i.year}-${i.month}`}>
+              <span>{i.month.toUpperCase()} <em>{i.year}</em></span>
+              <p>{String(inMonth.length).padStart(2, '0')} {inMonth.length === 1 ? 'ARTICLE' : 'ARTICLES'}<br />{[...new Set(inMonth.map(a => a.category))].join(' / ').toUpperCase()}</p>
+            </div>
+          })}</div>
+          <div className="entry-actions"><button disabled={!ready} onClick={() => enter(true)}>Enter with sound <span>↗</span></button><button className="entry-without" disabled={!ready} onClick={() => enter(false)}>…or without</button></div>
+        </div>
       </div>}
     </div>
   </ArchiveContext.Provider>

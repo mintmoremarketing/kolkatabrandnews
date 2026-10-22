@@ -1,4 +1,5 @@
 import type { Metadata } from 'next'
+import Script from 'next/script'
 import { getContent } from '@/lib/content'
 import { ArchiveShell } from '@/components/ArchiveShell'
 import './style.css'
@@ -10,5 +11,10 @@ export const metadata: Metadata = {
 }
 export default async function Layout({ children }: { children: React.ReactNode }) {
   const content = await getContent()
-  return <html lang="en"><body><ArchiveShell {...content}>{children}</ArchiveShell></body></html>
+  // Returning visitors on / skip the welcome screen; hide it before React loads so it doesn't flash.
+  const skipWelcome = `try{if(location.pathname==='/'&&sessionStorage.getItem('kbn-entered'))document.documentElement.dataset.kbnEntered='1'}catch(e){}`
+  return <html lang="en" suppressHydrationWarning><body>
+    <Script id="kbn-skip-welcome" strategy="beforeInteractive">{skipWelcome}</Script>
+    <ArchiveShell {...content}>{children}</ArchiveShell>
+  </body></html>
 }
