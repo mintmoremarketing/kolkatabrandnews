@@ -269,7 +269,7 @@ export function ArchiveShell({ articles, settings, preview, children }: { articl
       </nav>}
       {preview && <a className="preview-banner" href="/exit-preview">Draft preview · Exit ↗</a>}
       {!entered && <div className="entry-screen" role="dialog" aria-modal="true" aria-label="Welcome to Kolkata Brand News">
-        {articles[0]?.gallery[0] && <div className="entry-photo" aria-hidden="true"><img src={articles[0].gallery[0].src.replace(/^https?:\/\/[^/]+/, '')} alt="" /></div>}
+        {articles[0]?.gallery[0] && <div className="entry-photo" aria-hidden="true"><img src={articles[0].gallery[0].src} alt="" /></div>}
         <span className="entry-status label">{ready ? 'LOADED' : 'LOADING THE ARCHIVE…'}</span>
         <div className="entry-inventory label">{Array.from(new Map(items.map(i => [`${i.year}-${i.month}`, i])).values()).slice(0, 6).map(i => <div key={`${i.year}-${i.month}`}><span>{i.month.toUpperCase()}</span><p>ARTICLES ({articles.filter(a => a.date.slice(0,7) === i.article.date.slice(0,7)).length})<br />INSPIRATION<br />WORK & CULTURE<br />MUSIC PLAYLIST</p></div>)}</div>
         <div className="entry-actions"><button disabled={!ready} onClick={() => enter(true)}>Enter with sound <span>↗</span></button><button className="entry-without" disabled={!ready} onClick={() => enter(false)}>…or without</button></div>
